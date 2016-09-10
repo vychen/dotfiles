@@ -20,6 +20,8 @@ shopt -s histappend
 HISTSIZE=1000
 HISTFILESIZE=2000
 
+export LANG=en_US.utf8
+
 # export PROMPT_COMMAND='PS1="$(python ~/prompt.py)"'
 export PROMPT_COMMAND="history -a; history -c; history -r; $PRMOPT_COMMAND"
 

@@ -180,3 +180,5 @@ call matchadd('ColorColumn', '\%120v', 100)
 
 " Enables airline all the time.
 set laststatus=2
+
+let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
