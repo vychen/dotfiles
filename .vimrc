@@ -52,7 +52,7 @@ else  " for non-makefile files
   set ai
   set nocompatible
 endif
-  
+
 " Searching
 set ignorecase
 set smartcase
@@ -66,7 +66,12 @@ set textwidth=120
 syntax on
 
 " Enable copying
-set mouse=a
+" set mouse=a
+set mouse+=a
+if &term =~ '^screen'
+    " tmux knows the extended mouse mode
+    set ttymouse=xterm2
+endif
 " Set working directory to current file's.
 " set autochdir  " disabled because conflict with CtrlP
 
@@ -75,14 +80,20 @@ set backspace=indent,eol,start
 
 " Sync between intellij.
 set autoread
+au CursorHold * checktime
 
 " Dictates where split windows appear.
 set splitright
 set splitbelow
 
+" Specifies dir for swp files; double slash to avoid name collision.
+set backupdir=~/.vim/backup//
+set directory=~/.vim/swap//
+set undodir=~/.vim/undo//
+
 " Assumes tags generated in the current dir, from "ctags -R --exclude='.git'"
 " Searches for tags in the project root dir.
-set tags=./tags
+set tags=./tags,tags;$HOME
 
 " ------- More functionality ------------------------------------
 let mapleader="\<space>"
@@ -97,6 +108,11 @@ vmap <leader>P "+P
 
 " Adds new file in the same directory as current file.
 map <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
+
+" Window diff
+map <leader>d :windo diffthis<CR>
+map <leader>dw :set diffopt+=iwhite<CR>
+map <leader>du :diffupdate<CR>
 
 " Syntax highlighting for JSON to emulate Javascript.
 autocmd BufNewFile,BufRead *.json set ft=javascript
@@ -118,8 +134,10 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
-let g:syntastic_scala_checkers = ['pep8','pylint','python']
+let g:syntastic_python_checkers = ['pep8','python']
 let g:syntastic_scala_checkers = ['scalac','scalastyle']
+" let g:syntastic_java_checkers=['javac']
+let g:syntastic_java_javac_config_file_enabled = 1
 
 " LaTeX macros for compiling and viewing.
 augroup latex_macros " {
@@ -147,7 +165,7 @@ function DiffSetup()
   wincmd b
   set foldcolumn=0 number
   let &columns = &columns * 2
-  wincmd = 
+  wincmd =
   winpos 0 0
 endfunction
 if &diff
@@ -165,10 +183,12 @@ set wildignore+=*/build/**
 " disable caching
 let g:ctrlp_use_caching=0
 let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_regexp=1
 
 " CtrlSFPrompt
 nmap <leader>s <Plug>CtrlSFPrompt -R -I 
 nmap <leader>sw <Plug>CtrlSFCwordPath<CR>
+nnoremap <leader>ss :CtrlSFToggle<CR>
 
 " Slimux shortcuts.
 map <leader>t :SlimuxREPLSendLine<CR>
@@ -181,4 +201,37 @@ call matchadd('ColorColumn', '\%120v', 100)
 " Enables airline all the time.
 set laststatus=2
 
-let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
+" Git gutter shortcuts.
+nnoremap <leader>ga :Git add %:p<CR><CR>
+nnoremap <leader>gs :Gstatus<CR>
+
+" Syntastic shortcuts.
+nnoremap <leader>st :SyntasticToggleMode<CR>
+
+" Trims trailing whitespace.
+fun! TrimWhitespace()
+    let l:save_cursor = getpos('.')
+    %s/\s\+$//e
+    call setpos('.', l:save_cursor)
+endfun
+
+command! TrimWhitespace call TrimWhitespace()
+:noremap <Leader>ws :call TrimWhitespace()<CR>
+
+" Protect large files from sourcing and other overhead.
+" Files become read only
+if !exists("my_auto_commands_loaded")
+  let my_auto_commands_loaded = 1
+  " Large files are > 1M
+  " Set options:
+  " eventignore+=FileType (no syntax highlighting etc
+  " assumes FileType always on)
+  " noswapfile (save copy of file)
+  " bufhidden=unload (save memory when other file is viewed)
+  " buftype=nowrite (file is read-only)
+  " undolevels=-1 (no undo possible)
+  let g:LargeFile = 1024 * 1024 * 1
+  augroup LargeFile
+    autocmd BufReadPre * let f=expand("<afile>") | if getfsize(f) > g:LargeFile | set eventignore+=FileType | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | else | set eventignore-=FileType | endif
+    augroup END
+  endif
