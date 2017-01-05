@@ -46,8 +46,13 @@ let _curfile = expand("%:t")
 if _curfile =~ "Makefile" || _curfile =~ "makefile" || _curfile =~ ".*\.mk"
   set noexpandtab
 else  " for non-makefile files
-  set ts=2
-  set sw=2
+  if _curfile =~ "py"
+    set ts=4
+    set sw=4
+  else
+    set ts=2
+    set sw=2
+  endif
   set expandtab
   set ai
   set nocompatible
