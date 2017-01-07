@@ -21,6 +21,7 @@ Plugin 'christoomey/vim-tmux-navigator'  " <ctrl-hjkl> for splits and panes
 Plugin 'epeli/slimux'                    " Sends lines to tmux panes.
 Plugin 'Valloric/YouCompleteMe'          " Mostly for C/C++
 Plugin 'vim-airline/vim-airline'         " Status line
+Plugin 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -67,7 +68,7 @@ set hlsearch
 " Display
 set number
 set ruler
-set textwidth=120
+set textwidth=100
 syntax on
 
 " Enable copying
@@ -178,10 +179,10 @@ if &diff
 endif
 
 " CtrlP setting.
-let g:ctrlp_map = '<leader>f'
+let g:ctrlp_map = '<leader>g'
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
-nnoremap <leader>fo :CtrlPBuffer <CR>
-nnoremap <leader>fu :CtrlPMRU <CR>
+nnoremap <leader>go :CtrlPBuffer <CR>
+nnoremap <leader>gu :CtrlPMRU <CR>
 let g:ctrlp_buffer = '<leader>b'
 " Ignore these directories
 set wildignore+=*/build/**
@@ -199,9 +200,9 @@ nnoremap <leader>ss :CtrlSFToggle<CR>
 map <leader>t :SlimuxREPLSendLine<CR>
 vmap <leader>t :SlimuxREPLSendSelection<CR>
 
-" Highlight characters beyong 120 columns.
+" Highlight characters beyong 80 columns.
 highlight ColorColumn ctermbg=magenta guibg=Magenta
-call matchadd('ColorColumn', '\%120v', 100)
+call matchadd('ColorColumn', '\%80v', 70)
 
 " Enables airline all the time.
 set laststatus=2
@@ -240,3 +241,17 @@ if !exists("my_auto_commands_loaded")
     autocmd BufReadPre * let f=expand("<afile>") | if getfsize(f) > g:LargeFile | set eventignore+=FileType | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | else | set eventignore-=FileType | endif
     augroup END
   endif
+
+if &term =~ '256color'
+  " Disable Background Color Erase (BCE) so that color schemes
+  " work properly when Vim is used inside tmux and GNU screen.
+  set t_ut=
+endif
+
+" Cscope mapping
+" Finds all reference of text under cursor.
+nmap <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR>	
+" Finds all calls to text under cursor.
+nmap <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR>	
+" Finds global definition of text under cursor.
+nmap <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
