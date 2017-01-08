@@ -120,6 +120,9 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_scala_checkers = ['pep8','pylint','python']
 let g:syntastic_scala_checkers = ['scalac','scalastyle']
+let g:syntastic_cpp_compiler = 'g++'
+let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
+map <leader>st :SyntasticToggleMode<CR>
 
 " LaTeX macros for compiling and viewing.
 augroup latex_macros " {
@@ -180,5 +183,3 @@ call matchadd('ColorColumn', '\%120v', 100)
 
 " Enables airline all the time.
 set laststatus=2
-
-let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
