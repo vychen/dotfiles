@@ -101,6 +101,12 @@ set undodir=~/.vim/undo//
 " Searches for tags in the project root dir.
 set tags=./tags,tags;$HOME
 
+" Folding
+set foldmethod=syntax
+set foldnestmax=10
+set nofoldenable
+set foldlevel=2
+
 " ------- More functionality ------------------------------------
 let mapleader="\<space>"
 
@@ -140,11 +146,8 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
-let g:syntastic_python_checkers = ['pep8','pylint','python']
+let g:syntastic_python_checkers = ['pep8','python']
 let g:syntastic_scala_checkers = ['scalac','scalastyle']
-let g:syntastic_cpp_compiler = 'g++'
-let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
-map <leader>st :SyntasticToggleMode<CR>
 " let g:syntastic_java_checkers=['javac']
 let g:syntastic_java_javac_config_file_enabled = 1
 
@@ -203,9 +206,9 @@ nnoremap <leader>ss :CtrlSFToggle<CR>
 map <leader>t :SlimuxREPLSendLine<CR>
 vmap <leader>t :SlimuxREPLSendSelection<CR>
 
-" Highlight characters beyong 80 columns.
+" Highlight characters beyong 120 columns.
 highlight ColorColumn ctermbg=magenta guibg=Magenta
-call matchadd('ColorColumn', '\%80v', 70)
+call matchadd('ColorColumn', '\%120v', 110)
 
 " Enables airline all the time.
 set laststatus=2
@@ -253,8 +256,8 @@ endif
 
 " Cscope mapping
 " Finds all reference of text under cursor.
-nmap <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR>	
+nmap <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR>
 " Finds all calls to text under cursor.
-nmap <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR>	
+nmap <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR>
 " Finds global definition of text under cursor.
 nmap <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
