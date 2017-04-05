@@ -22,6 +22,8 @@ Plugin 'epeli/slimux'                    " Sends lines to tmux panes.
 Plugin 'Valloric/YouCompleteMe'          " Mostly for C/C++
 Plugin 'vim-airline/vim-airline'         " Status line
 Plugin 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
+Plugin 'elubow/cql-vim'                  " CQL syntax.
+Plugin 'flazz/vim-colorschemes'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -188,12 +190,12 @@ endif
 
 " CtrlP setting.
 let g:ctrlp_map = '<leader>g'
-let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+" let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 nnoremap <leader>go :CtrlPBuffer <CR>
 nnoremap <leader>gu :CtrlPMRU <CR>
 let g:ctrlp_buffer = '<leader>b'
 " Ignore these directories
-set wildignore+=*/build/**
+set wildignore+=*.class,*/\.git/*
 " disable caching
 let g:ctrlp_use_caching=0
 let g:ctrlp_working_path_mode = 'ra'
@@ -208,9 +210,9 @@ nnoremap <leader>ss :CtrlSFToggle<CR>
 map <leader>t :SlimuxREPLSendLine<CR>
 vmap <leader>t :SlimuxREPLSendSelection<CR>
 
-" Highlight characters beyong 120 columns.
+" Highlight characters beyond 120 columns.
 highlight ColorColumn ctermbg=magenta guibg=Magenta
-call matchadd('ColorColumn', '\%120v', 110)
+call matchadd('ColorColumn', '\%120v', 120)
 
 " Enables airline all the time.
 set laststatus=2
@@ -263,3 +265,11 @@ nmap <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR>
 nmap <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR>
 " Finds global definition of text under cursor.
 nmap <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
+
+" Eclim
+nmap <Leader>es :ScalaSearch<CR>
+nmap <Leader>ei :ScalaImport<CR>
+nmap <Leader>ev :Validate<CR>
+let g:EclimFileTypeValidate = 0
+let g:EclimCompletionMethod = 'omnifunc'
+let g:EclimMavenPomClasspathUpdate = 0

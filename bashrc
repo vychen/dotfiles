@@ -25,8 +25,11 @@ export LANG=en_US.utf8
 # export PROMPT_COMMAND='PS1="$(python ~/prompt.py)"'
 export PROMPT_COMMAND="history -a; history -c; history -r; $PRMOPT_COMMAND"
 
+export SPARK_HOME=/usr/local/bin/spark-2.1.0-bin-hadoop2.7
 export PIG_HOME=/usr/lib/pig/pig-0.15.0-src
-export PATH=$PIG_HOME/bin:$PATH
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre/
+export MAVEN_HOME=/usr/local/bin/apache-maven-3.3.9
+export PATH=$PIG_HOME/bin:$MAVEN_HOME/bin:$SPARK_HOME:$PATH
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
