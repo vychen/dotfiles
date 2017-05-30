@@ -23,7 +23,8 @@ Plugin 'Valloric/YouCompleteMe'          " Mostly for C/C++
 Plugin 'vim-airline/vim-airline'         " Status line
 Plugin 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
 Plugin 'elubow/cql-vim'                  " CQL syntax.
-Plugin 'flazz/vim-colorschemes'
+Plugin 'flazz/vim-colorschemes'          " Additional colorschemes.
+Plugin 'jonstoler/werewolf.vim'          " Switch between light/dark theme.
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -49,13 +50,8 @@ let _curfile = expand("%:t")
 if _curfile =~ "Makefile" || _curfile =~ "makefile" || _curfile =~ ".*\.mk"
   set noexpandtab
 else  " for non-makefile files
-  if _curfile =~ "py"
-    set ts=4
-    set sw=4
-  else
-    set ts=2
-    set sw=2
-  endif
+  set ts=2
+  set sw=2
   set expandtab
   set ai
   set nocompatible
@@ -194,12 +190,16 @@ let g:ctrlp_map = '<leader>g'
 nnoremap <leader>go :CtrlPBuffer <CR>
 nnoremap <leader>gu :CtrlPMRU <CR>
 let g:ctrlp_buffer = '<leader>b'
-" Ignore these directories
-set wildignore+=*.class,*/\.git/*
+" Ignore these files or directories.
+" set wildignore+=*/bin/*,*.class,*.pyc,*/\.git/*
 " disable caching
 let g:ctrlp_use_caching=0
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_regexp=1
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/](\.git|bin|lib|docs)$',
+  \ 'file': '\v\.(class|pyc|parquet)$',
+  \ }
 
 " CtrlSFPrompt
 nmap <leader>s <Plug>CtrlSFPrompt -R -I 
@@ -209,10 +209,6 @@ nnoremap <leader>ss :CtrlSFToggle<CR>
 " Slimux shortcuts.
 map <leader>t :SlimuxREPLSendLine<CR>
 vmap <leader>t :SlimuxREPLSendSelection<CR>
-
-" Highlight characters beyond 120 columns.
-highlight ColorColumn ctermbg=magenta guibg=Magenta
-call matchadd('ColorColumn', '\%120v', 120)
 
 " Enables airline all the time.
 set laststatus=2
@@ -273,3 +269,26 @@ nmap <Leader>ev :Validate<CR>
 let g:EclimFileTypeValidate = 0
 let g:EclimCompletionMethod = 'omnifunc'
 let g:EclimMavenPomClasspathUpdate = 0
+
+let g:werewolf_day_themes = ['summerfruit256']
+let g:werewolf_night_themes = ['desert-warm-256']
+let g:werewolf_day_start = 8
+let g:werewolf_day_end = 15
+
+augroup scala
+  au FileType scala call matchadd('ColorColumn', '\%120v', 120)
+augroup END
+
+augroup python
+  au FileType python set ts=4
+  au FileType python set sw=4
+  au FileType python call matchadd('ColorColumn', '\%80v', 80)
+augroup END
+
+augroup xml
+  au FileType xml set ts=4
+  au FileType xml set sw=4
+augroup END
+
+nmap <Leader>aw :!python /home/victor/scripts/upload.py<CR>
+nmap <Leader>as :!python /home/victor/scripts/source-cql.py<CR>
