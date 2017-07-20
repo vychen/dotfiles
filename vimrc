@@ -290,5 +290,9 @@ augroup xml
   au FileType xml set sw=4
 augroup END
 
+augroup txt
+  au FileType text set syntax=conf
+augroup END
+
 nmap <Leader>aw :!python /home/victor/scripts/upload.py<CR>
 nmap <Leader>as :!python /home/victor/scripts/source-cql.py<CR>
