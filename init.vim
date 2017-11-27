@@ -1,50 +1,33 @@
-" ------ start of Vundle configuration -------------
-set nocompatible              " be iMproved, required
-filetype off                  " required
+" Load vim-plug
+if empty(glob("~/.local/share/nvim/site/autoload/plug.vim"))
+  execute '!curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.github.com/junegunn/vim-plug/master/plug.vim'
+endif
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-
-" Installs these plugins.
-Plugin 'desert-warm-256'                 " Dark background
-Plugin 'scrooloose/syntastic'            " Syntax highlighting
-Plugin 'derekwyatt/vim-scala'            " Scala syntax
-Plugin 'fatih/vim-go'                    " Golang.
-Plugin 'tpope/vim-fugitive'              " Github
-Plugin 'airblade/vim-gitgutter'          " Git diff
-Plugin 'ctrlpvim/ctrlp.vim'              " Current fork of ctrlp
-Plugin 'mileszs/ack.vim'                 " Light wrapper around Ack
-Plugin 'dyng/ctrlsf.vim'                 " Wrapper around Ack
-Plugin 'christoomey/vim-tmux-navigator'  " <ctrl-hjkl> for splits and panes
-Plugin 'epeli/slimux'                    " Sends lines to tmux panes.
-Plugin 'Valloric/YouCompleteMe'          " Mostly for C/C++
-Plugin 'vim-airline/vim-airline'         " Status line
-Plugin 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
-Plugin 'elubow/cql-vim'                  " CQL syntax.
-Plugin 'flazz/vim-colorschemes'          " Additional colorschemes.
-Plugin 'jonstoler/werewolf.vim'          " Switch between light/dark theme.
-
-call vundle#end()            " required
-filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" ------- end of Vundle configuration -------------
+" :PlugInstall
+call plug#begin()
+Plug 'rainux/desert-warm-256'          " Dark background
+Plug 'scrooloose/syntastic'            " Syntax highlighting
+Plug 'derekwyatt/vim-scala'            " Scala syntax
+Plug 'fatih/vim-go'                    " Golang.
+Plug 'sebdah/vim-delve'                " Golang debugger.
+Plug 'tpope/vim-fugitive'              " Github
+Plug 'airblade/vim-gitgutter'          " Git diff
+Plug 'ctrlpvim/ctrlp.vim'              " Current fork of ctrlp
+Plug 'mileszs/ack.vim'                 " Light wrapper around Ack
+Plug 'dyng/ctrlsf.vim'                 " Wrapper around Ack
+Plug 'christoomey/vim-tmux-navigator'  " <ctrl-hjkl> for splits and panes
+Plug 'epeli/slimux'                    " Sends lines to tmux panes.
+Plug 'Valloric/YouCompleteMe'          " Mostly for C/C++
+Plug 'vim-airline/vim-airline'         " Status line
+Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
+Plug 'elubow/cql-vim'                  " CQL syntax.
+Plug 'flazz/vim-colorschemes'          " Additional colorschemes.
+call plug#end()
 
 " Background
-set bg=dark
+set bg=light
 set t_Co=256
-colorscheme desert-warm-256
+colorscheme PaperColor
 
 " YouCompleteMe requires utf-8.
 set encoding=utf-8
@@ -268,10 +251,7 @@ let g:EclimMavenPomClasspathUpdate = 0
 let g:go_list_autoclose = 0
 let g:go_fmt_command = "goimports"
 
-let g:werewolf_day_themes = ['summerfruit256']
-let g:werewolf_night_themes = ['desert-warm-256']
-let g:werewolf_day_start = 9
-let g:werewolf_day_end = 18
+let g:delve_backend="native"
 
 augroup scala
   au FileType scala call matchadd('ColorColumn', '\%120v', 120)
