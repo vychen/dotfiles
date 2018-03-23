@@ -22,6 +22,8 @@ Plug 'vim-airline/vim-airline'         " Status line
 Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
 Plug 'elubow/cql-vim'                  " CQL syntax.
 Plug 'flazz/vim-colorschemes'          " Additional colorschemes.
+Plug 'nvie/vim-flake8'
+Plug 'vim-scripts/indentpython.vim'
 call plug#end()
 
 " Background
@@ -131,13 +133,19 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
-let g:syntastic_python_checkers = ['pep8','pylint','python']
+let g:syntastic_python_checkers = ['pylint','python']
 let g:syntastic_scala_checkers = ['scalac','scalastyle']
 let g:syntastic_cpp_compiler = 'g++'
 let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
 let g:syntastic_go_checkers = ['gofmt']
 " let g:syntastic_java_checkers=['javac']
 let g:syntastic_java_javac_config_file_enabled = 1
+
+" Flake8 settings.
+let g:flake8_show_quickfix=1  " don't show
+
+" YCM setting.
+let g:ycm_autoclose_preview_window_after_completion=1
 
 " LaTeX macros for compiling and viewing.
 augroup latex_macros " {
@@ -175,6 +183,7 @@ endif
 " CtrlP setting.
 let g:ctrlp_map = '<leader>g'
 " let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+nnoremap <leader>gb :CtrlPBuffer <CR>
 nnoremap <leader>go :CtrlPBuffer <CR>
 nnoremap <leader>gu :CtrlPMRU <CR>
 let g:ctrlp_buffer = '<leader>b'
@@ -185,7 +194,7 @@ let g:ctrlp_use_caching=0
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_regexp=1
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/](\.git|bin|lib|docs)$',
+  \ 'dir':  '\v[\/](\.git|bin|lib|docs|vendor)$',
   \ 'file': '\v\.(class|pyc|parquet)$',
   \ }
 
@@ -250,6 +259,7 @@ let g:EclimMavenPomClasspathUpdate = 0
 " vim-go
 let g:go_list_autoclose = 0
 let g:go_fmt_command = "goimports"
+let g:go_auto_type_info = 1
 
 let g:delve_backend="native"
 
@@ -260,17 +270,23 @@ augroup scala
   au FileType scala map <buffer> <Leader>fv :Validate<CR>
 augroup END
 
-augroup python
-  au FileType python set ts=4
-  au FileType python set sw=4
-  au FileType python call matchadd('ColorColumn', '\%80v', 80)
+au BufNewFile,BufRead *.py
+    \ set tabstop=4 |
+    \ set softtabstop=4 |
+    \ set shiftwidth=4 |
+    \ set textwidth=79 |
+    \ set expandtab |
+    \ set autoindent |
+    \ set fileformat=unix |
 
-  au FileType python map <buffer> <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR>
-  " Finds all calls to text under cursor.
-  au FileType python map <buffer> <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR>
-  " Finds global definition of text under cursor.
-  au FileType python map <buffer> <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
-augroup END
+augroup python
+
+    au FileType python map <buffer> <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR> |
+    " Finds all calls to text under cursor.
+    au FileType python map <buffer> <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR> |
+    " Finds global definition of text under cursor.
+    au FileType python map <buffer> <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
+augroup python
 
 augroup xml
   au FileType xml set ts=4
