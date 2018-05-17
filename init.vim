@@ -1,30 +1,33 @@
-" Load vim-plug
+let mapleader="\<space>"
+
+" Loads vim-plug.
 if empty(glob("~/.local/share/nvim/site/autoload/plug.vim"))
   execute '!curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.github.com/junegunn/vim-plug/master/plug.vim'
 endif
 
+" ------ start of Plug configuration -------------
 " :PlugInstall
 call plug#begin()
-Plug 'rainux/desert-warm-256'          " Dark background
-Plug 'scrooloose/syntastic'            " Syntax highlighting
-Plug 'derekwyatt/vim-scala'            " Scala syntax
-Plug 'fatih/vim-go'                    " Golang.
-Plug 'sebdah/vim-delve'                " Golang debugger.
-Plug 'tpope/vim-fugitive'              " Github
 Plug 'airblade/vim-gitgutter'          " Git diff
-Plug 'ctrlpvim/ctrlp.vim'              " Current fork of ctrlp
-Plug 'mileszs/ack.vim'                 " Light wrapper around Ack
-Plug 'dyng/ctrlsf.vim'                 " Wrapper around Ack
 Plug 'christoomey/vim-tmux-navigator'  " <ctrl-hjkl> for splits and panes
-Plug 'epeli/slimux'                    " Sends lines to tmux panes.
-Plug 'Valloric/YouCompleteMe'          " Mostly for C/C++
-Plug 'vim-airline/vim-airline'         " Status line
-Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
+Plug 'ctrlpvim/ctrlp.vim'              " Current fork of ctrlp
+Plug 'derekwyatt/vim-scala'            " Scala syntax
+Plug 'dyng/ctrlsf.vim'                 " Wrapper around Ack
 Plug 'elubow/cql-vim'                  " CQL syntax.
+Plug 'epeli/slimux'                    " Sends lines to tmux panes.
+Plug 'farmergreg/vim-lastplace'        " Restores last cursor position.
+Plug 'fatih/vim-go'                    " Golang.
 Plug 'flazz/vim-colorschemes'          " Additional colorschemes.
-Plug 'nvie/vim-flake8'
-Plug 'vim-scripts/indentpython.vim'
+Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
+Plug 'mileszs/ack.vim'                 " Light wrapper around Ack
+Plug 'nvie/vim-flake8'                 " Static checker for python.
+Plug 'scrooloose/syntastic'            " Syntax highlighting
+Plug 'tpope/vim-fugitive'              " Github
+Plug 'Valloric/YouCompleteMe'          " Completion engine
+Plug 'vim-airline/vim-airline'         " Status line
+Plug 'vim-scripts/indentpython.vim'    " Auto-indent for python.
 call plug#end()
+"""""" END OF PLUG CONFIGURATION """""""""""""""
 
 " Background
 set bg=light
@@ -59,14 +62,11 @@ set textwidth=100
 syntax on
 
 " Enable copying
-" set mouse=a
 set mouse+=a
 if &term =~ '^screen'
     " tmux knows the extended mouse mode
     set ttymouse=xterm2
 endif
-" Set working directory to current file's.
-" set autochdir  " disabled because conflict with CtrlP
 
 " Sets backspace functionalty.
 set backspace=indent,eol,start
@@ -80,6 +80,15 @@ set splitright
 set splitbelow
 
 " Specifies dir for swp files; double slash to avoid name collision.
+if empty(glob("~/.vim/backup/"))
+  execute '!mkdir ~/.vim/backup'
+endif
+if empty(glob("~/.vim/swap/"))
+  execute '!mkdir ~/.vim/swap'
+endif
+if empty(glob("~/.vim/undo/"))
+  execute '!mkdir ~/.vim/undo'
+endif
 set backupdir=~/.vim/backup//
 set directory=~/.vim/swap//
 set undodir=~/.vim/undo//
@@ -95,8 +104,6 @@ set nofoldenable
 set foldlevel=2
 
 " ------- More functionality ------------------------------------
-let mapleader="\<space>"
-
 " Shortcuts for copy and paste to system clipboard.
 vmap <leader>y "+y
 vmap <leader>d "+d
@@ -112,17 +119,6 @@ map <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 map <leader>d :windo diffthis<CR>
 map <leader>dw :set diffopt+=iwhite<CR>
 map <leader>du :diffupdate<CR>
-
-" Syntax highlighting for JSON to emulate Javascript.
-autocmd BufNewFile,BufRead *.json set ft=javascript
-
-" Recognizes gradle file as groovy syntax.
-au BufNewFile,BufRead *.gradle setf groovy
-
-" Syntax highlighting for PIG (requires pig.vim in ~/.vim/syntax/
-augroup filetypedetect
-  au BufNewFile,BufRead *.pig set filetype=pig syntax=pig
-augroup END
 
 " Syntastic settings
 set statusline+=%#warningmsg#
@@ -146,25 +142,6 @@ let g:flake8_show_quickfix=1  " don't show
 
 " YCM setting.
 let g:ycm_autoclose_preview_window_after_completion=1
-
-" LaTeX macros for compiling and viewing.
-augroup latex_macros " {
-    autocmd!
-    autocmd FileType tex :nnoremap <leader>l :w<CR>:!rubber --pdf --warn all %<CR>
-    autocmd FileType tex :nnoremap <leader>v :!mupdf %:r.pdf &<CR><CR>
-augroup END " }
-
-" Restores cursor position to previous edit.
-function! ResCur()
-  if line("'\"") <= line("$")
-    normal! g`"
-    return 1
-  endif
-endfunction
-augroup resCur
-  autocmd!
-  autocmd BufWinEnter * call ResCur()
-augroup END
 
 " Sets up diff with a wider screen.
 function DiffSetup()
@@ -241,9 +218,9 @@ if !exists("my_auto_commands_loaded")
   " undolevels=-1 (no undo possible)
   let g:LargeFile = 1024 * 1024 * 1
   augroup LargeFile
-    autocmd BufReadPre * let f=expand("<afile>") | if getfsize(f) > g:LargeFile | set eventignore+=FileType | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | else | set eventignore-=FileType | endif
-    augroup END
-  endif
+    au BufReadPre * let f=expand("<afile>") | if getfsize(f) > g:LargeFile | set eventignore+=FileType | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | else | set eventignore-=FileType | endif
+  augroup END
+endif
 
 if &term =~ '256color'
   " Disable Background Color Erase (BCE) so that color schemes
@@ -261,13 +238,35 @@ let g:go_list_autoclose = 0
 let g:go_fmt_command = "goimports"
 let g:go_auto_type_info = 1
 
-let g:delve_backend="native"
+" Syntax highlighting.
+augroup filetypedetect
+  au BufNewFile,BufRead *.json set ft=javascript
+  au BufNewFile,BufRead *.gradle set ft=groovy
+  " requires pig.vim in ~/.vim/syntax/
+  au BufNewFile,BufRead *.pig set ft=pig syntax=pig
+augroup END
+
+" LaTeX macros for compiling and viewing.
+augroup latex_macros
+  au!
+  au FileType tex :nnoremap <leader>l :w<CR>:!rubber --pdf --warn all %<CR>
+  au FileType tex :nnoremap <leader>v :!mupdf %:r.pdf &<CR><CR>
+augroup END
 
 augroup scala
   au FileType scala call matchadd('ColorColumn', '\%120v', 120)
   au FileType scala map <buffer> <Leader>fd :ScalaSearch<CR>
   au FileType scala map <buffer> <Leader>fi :ScalaImport<CR>
   au FileType scala map <buffer> <Leader>fv :Validate<CR>
+augroup END
+
+augroup cpp
+  au FileType cpp call matchadd('ColorColumn', '\%80v', 80)
+  au FileType cpp map <buffer> <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR>
+  " Finds all calls to text under cursor.
+  au FileType cpp map <buffer> <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR>
+  " Finds global definition of text under cursor.
+  au FileType cpp map <buffer> <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
 augroup END
 
 au BufNewFile,BufRead *.py
@@ -280,13 +279,12 @@ au BufNewFile,BufRead *.py
     \ set fileformat=unix |
 
 augroup python
-
     au FileType python map <buffer> <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR> |
     " Finds all calls to text under cursor.
     au FileType python map <buffer> <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR> |
     " Finds global definition of text under cursor.
     au FileType python map <buffer> <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
-augroup python
+augroup END
 
 augroup xml
   au FileType xml set ts=4
