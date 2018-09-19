@@ -130,6 +130,7 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
+let g:syntastic_mode_map = {'mode': 'passive'}
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
@@ -176,7 +177,7 @@ let g:ctrlp_use_caching=0
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_regexp=1
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/](\.git|bin|lib|docs|vendor)$',
+  \ 'dir':  '\v[\/](\.git|bin|docs|vendor)$',
   \ 'file': '\v\.(class|pyc|parquet)$',
   \ }
 
@@ -284,11 +285,17 @@ au BufNewFile,BufRead *.py
     \ set fileformat=unix |
 
 augroup python
-    au FileType python map <buffer> <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR> |
-    " Finds all calls to text under cursor.
-    au FileType python map <buffer> <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR> |
-    " Finds global definition of text under cursor.
-    au FileType python map <buffer> <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
+  au FileType python map <buffer> <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR>
+  " Finds all calls to text under cursor.
+  au FileType python map <buffer> <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR>
+  " Finds global definition of text under cursor.
+  au FileType python map <buffer> <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
+  au FileType python call matchadd('ColorColumn', '\%80v', 80)
+augroup END
+
+augroup vimrc_autocmds
+  autocmd BufEnter * highlight OverLength ctermbg=red guibg=#111111
+  autocmd BufEnter * match OverLength /\%80v.*/
 augroup END
 
 augroup xml
@@ -301,6 +308,8 @@ augroup txt
 augroup END
 
 augroup go
+  au BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2
   au FileType go map <buffer> ,gd :GoDef <C-R>=expand("<cword>")<CR><CR>
   au FileType go map <buffer> ,ga :GoAlternate<CR>
+  au FileType go set ts=2
 augroup END
