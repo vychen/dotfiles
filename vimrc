@@ -2,15 +2,14 @@ set nocompatible              " be iMproved, required
 filetype off                  " required
 let mapleader="\<space>"
 
+"""""" START OF PLUG CONFIGURATION """"""""""""""""""""""""
 " Loads vim-plug.
 if empty(glob("~/.vim/autoload/plug.vim"))
   execute '!curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 endif
 
-" ------ start of Plug configuration -------------
-" :PlugInstall
+" :PlugInstall, :PlugClean
 call plug#begin()
-Plug 'airblade/vim-gitgutter'          " Git diff
 Plug 'christoomey/vim-tmux-navigator'  " <ctrl-hjkl> for splits and panes
 Plug 'ctrlpvim/ctrlp.vim'              " Current fork of ctrlp
 Plug 'derekwyatt/vim-scala'            " Scala syntax
@@ -22,12 +21,16 @@ Plug 'fatih/vim-go'                    " Golang.
 Plug 'flazz/vim-colorschemes'          " Additional colorschemes.
 Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
 Plug 'mileszs/ack.vim'                 " Light wrapper around Ack
+Plug 'mhinz/vim-signify'               " Diff hunk changes.
+Plug 'NLKNguyen/papercolor-theme'      " PaperColor colorscheme.
 Plug 'nvie/vim-flake8'                 " Static checker for python.
-Plug 'scrooloose/syntastic'            " Syntax highlighting
+Plug 'prabirshrestha/async.vim'        " Normalize async jobs.
+Plug 'prabirshrestha/vim-lsp'          " Language server protocl.
 Plug 'tpope/vim-fugitive'              " Github
-Plug 'Valloric/YouCompleteMe'          " Completion engine
 Plug 'vim-airline/vim-airline'         " Status line
+Plug 'vim-airline/vim-airline-themes'  " Status line theme.
 Plug 'vim-scripts/indentpython.vim'    " Auto-indent for python.
+Plug 'vim-scripts/LargeFile'           " Disables features for large files.
 call plug#end()
 """""" END OF PLUG CONFIGURATION """""""""""""""
 
@@ -38,21 +41,39 @@ syntax on
 set bg=light
 set t_Co=256
 colorscheme PaperColor
-
-" YouCompleteMe requires utf-8.
-set encoding=utf-8
-
-" Tabs
-let _curfile = expand("%:t")
-if _curfile =~ "Makefile" || _curfile =~ "makefile" || _curfile =~ ".*\.mk"
-  set noexpandtab
-else  " for non-makefile files
-  set ts=2
-  set sw=2
-  set expandtab
-  set ai
-  set nocompatible
+if &term =~ '256color'
+  " Disable Background Color Erase (BCE) so that color schemes
+  " work properly when Vim is used inside tmux and GNU screen.
+  set t_ut=
 endif
+
+set encoding=utf-8        " YouCompleteMe requires utf-8.
+
+set ts=2
+set sw=2
+set expandtab
+set autoindent
+augroup style
+  au FileType make setlocal noexpandtab
+  au FileType go setlocal noexpandtab ts=2 sw=2
+  au FileType py setlocal sts=2 ff=unix
+  au FileType text setlocal syntax=conf
+augroup END
+
+" Syntax highlighting.
+augroup filetypedetect
+  au BufNewFile,BufRead *.json set ft=javascript
+  au BufNewFile,BufRead *.gradle set ft=groovy
+  " Requires file ~/.vim/syntax/pig.vim
+  au BufNewFile,BufRead *.pig set ft=pig syntax=pig
+augroup END
+
+" Highlight long lines.
+augroup highlight_max_length
+  au FileType scala call matchadd('ColorColumn', '\%120v', 120)
+  au FileType cpp,h call matchadd('ColorColumn', '\%80v', 80)
+  au FileType python call matchadd('ColorColumn', '\%80v', 80)
+augroup END
 
 " Searching
 set ignorecase
@@ -63,8 +84,7 @@ set hlsearch
 " Display
 set number
 set ruler
-set textwidth=100
-syntax on
+set textwidth=80
 
 " Enable copying
 set mouse+=a
@@ -76,7 +96,7 @@ endif
 " Sets backspace functionalty.
 set backspace=indent,eol,start
 
-" Sync between intellij.
+" Sync file if modified outside of vim.
 set autoread
 au CursorHold * checktime
 
@@ -108,7 +128,7 @@ set foldnestmax=10
 set nofoldenable
 set foldlevel=2
 
-" ------- More functionality ------------------------------------
+"""""""" START OF CUSTOM SHORTCUTS """"""""""""""""""""""
 " Shortcuts for copy and paste to system clipboard.
 vmap <leader>y "+y
 vmap <leader>d "+d
@@ -125,30 +145,30 @@ map <leader>d :windo diffthis<CR>
 map <leader>dw :set diffopt+=iwhite<CR>
 map <leader>du :diffupdate<CR>
 
-" Syntastic settings
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+" Allows code navigation when { appears at the end of a line.
+map ]] :call search("^\\(\\w.*\\)\\?{")<CR>
+map [[ :call search("^\\(\\w.*\\)\\?{", "b")<CR>
+map ][ :call search("^}")<CR>
+map [] :call search("^}", "b")<CR>
+"""""""" END OF CUSTOM SHORTCUTS """"""""""""""""""""""
 
-let g:syntastic_mode_map = {'mode': 'passive'}
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_python_checkers = ['pylint','python']
-let g:syntastic_scala_checkers = ['scalac','scalastyle']
-let g:syntastic_cpp_compiler = 'g++'
-let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
-let g:syntastic_go_checkers = ['gofmt']
-" let g:syntastic_java_checkers=['javac']
-let g:syntastic_java_javac_config_file_enabled = 1
+"""""""" START OF LANGUAGE-SPECIFIC SHORTCUTS """""""""""""""
+" LaTeX macros for compiling and viewing.
+augroup latex_macros
+  au!
+  au FileType tex :nnoremap <leader>l :w<CR>:!rubber --pdf --warn all %<CR>
+  au FileType tex :nnoremap <leader>v :!mupdf %:r.pdf &<CR><CR>
+augroup END
 
-" Flake8 settings.
-let g:flake8_show_quickfix=1  " don't show
+augroup scala
+  au FileType scala map <buffer> <Leader>fd :ScalaSearch<CR>
+  au FileType scala map <buffer> <Leader>fi :ScalaImport<CR>
+  au FileType scala map <buffer> <Leader>fv :Validate<CR>
+augroup END
+"""""""" END OF LANGUAGE-SPECIFIC SHORTCUTS """"""""""""""""""
 
-" YCM setting.
-let g:ycm_autoclose_preview_window_after_completion=1
 
+"""""""" START OF FUNCTIONS  """""""""""""""""""""""""
 " Sets up diff with a wider screen.
 function DiffSetup()
   " set nofoldenable foldcolumn=0 number
@@ -163,16 +183,51 @@ if &diff
   autocmd VimEnter * call DiffSetup()
 endif
 
+" Highlights all instances of word under cursor, when idle.
+" Type z/ to toggle highlighting on/off.
+function! AutoHighlightToggle()
+  let @/ = ''
+  if exists('#auto_highlight')
+    au! auto_highlight
+    augroup! auto_highlight
+    setl updatetime=4000
+    echo 'Highlight current word: off'
+    return 0
+  else
+    augroup auto_highlight
+      au!
+      au CursorHold * let @/ = '\V\<'.escape(expand('<cword>'), '\').'\>'
+    augroup end
+    setl updatetime=500
+    echo 'Highlight current word: ON'
+    return 1
+  endif
+endfunction
+
+nnoremap z/ :if AutoHighlightToggle()<Bar>set hls<Bar>endif<CR>
+
+" Trims trailing whitespace.
+function! TrimWhitespace()
+  let l:save_cursor = getpos('.')
+  %s/\s\+$//e
+  call setpos('.', l:save_cursor)
+endfunction
+
+command! TrimWhitespace call TrimWhitespace()
+:noremap <Leader>ws :call TrimWhitespace()<CR>
+
+"""""""" START OF PLUGIN SETTINGS """""""""""""""""
+" Flake8 settings.
+let g:flake8_show_quickfix=1  " don't show
+
+" YCM setting.
+let g:ycm_autoclose_preview_window_after_completion=1
+
 " CtrlP setting.
-let g:ctrlp_map = '<leader>g'
-" let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
-nnoremap <leader>gb :CtrlPBuffer <CR>
-nnoremap <leader>go :CtrlPBuffer <CR>
-nnoremap <leader>gu :CtrlPMRU <CR>
+nnoremap f :CtrlPMixed <CR>
+nnoremap fb :CtrlPBuffer <CR>
+nnoremap fu :CtrlPMRU <CR>
 let g:ctrlp_buffer = '<leader>b'
-" Ignore these files or directories.
-" set wildignore+=*/bin/*,*.class,*.pyc,*/\.git/*
-" disable caching
 let g:ctrlp_use_caching=0
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_regexp=1
@@ -192,47 +247,11 @@ vmap <leader>t :SlimuxREPLSendSelection<CR>
 
 " Enables airline all the time.
 set laststatus=2
+let g:airline_theme='papercolor'
 
 " Git gutter shortcuts.
 nnoremap <leader>ga :Git add %:p<CR><CR>
 nnoremap <leader>gs :Gstatus<CR>
-
-" Syntastic shortcuts.
-nnoremap <leader>st :SyntasticToggleMode<CR>
-
-" Trims trailing whitespace.
-fun! TrimWhitespace()
-    let l:save_cursor = getpos('.')
-    %s/\s\+$//e
-    call setpos('.', l:save_cursor)
-endfun
-
-command! TrimWhitespace call TrimWhitespace()
-:noremap <Leader>ws :call TrimWhitespace()<CR>
-
-" Protect large files from sourcing and other overhead.
-" Files become read only
-if !exists("my_auto_commands_loaded")
-  let my_auto_commands_loaded = 1
-  " Large files are > 1M
-  " Set options:
-  " eventignore+=FileType (no syntax highlighting etc
-  " assumes FileType always on)
-  " noswapfile (save copy of file)
-  " bufhidden=unload (save memory when other file is viewed)
-  " buftype=nowrite (file is read-only)
-  " undolevels=-1 (no undo possible)
-  let g:LargeFile = 1024 * 1024 * 1
-  augroup LargeFile
-    au BufReadPre * let f=expand("<afile>") | if getfsize(f) > g:LargeFile | set eventignore+=FileType | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | else | set eventignore-=FileType | endif
-  augroup END
-endif
-
-if &term =~ '256color'
-  " Disable Background Color Erase (BCE) so that color schemes
-  " work properly when Vim is used inside tmux and GNU screen.
-  set t_ut=
-endif
 
 " Eclim
 let g:EclimFileTypeValidate = 0
@@ -244,72 +263,12 @@ let g:go_list_autoclose = 0
 let g:go_fmt_command = "goimports"
 let g:go_auto_type_info = 1
 
-" Syntax highlighting.
-augroup filetypedetect
-  au BufNewFile,BufRead *.json set ft=javascript
-  au BufNewFile,BufRead *.gradle set ft=groovy
-  " requires pig.vim in ~/.vim/syntax/
-  au BufNewFile,BufRead *.pig set ft=pig syntax=pig
-augroup END
-
-" LaTeX macros for compiling and viewing.
-augroup latex_macros
-  au!
-  au FileType tex :nnoremap <leader>l :w<CR>:!rubber --pdf --warn all %<CR>
-  au FileType tex :nnoremap <leader>v :!mupdf %:r.pdf &<CR><CR>
-augroup END
-
-augroup scala
-  au FileType scala call matchadd('ColorColumn', '\%120v', 120)
-  au FileType scala map <buffer> <Leader>fd :ScalaSearch<CR>
-  au FileType scala map <buffer> <Leader>fi :ScalaImport<CR>
-  au FileType scala map <buffer> <Leader>fv :Validate<CR>
-augroup END
-
-augroup cpp
-  au FileType cpp call matchadd('ColorColumn', '\%80v', 80)
-  au FileType cpp map <buffer> <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR>
-  " Finds all calls to text under cursor.
-  au FileType cpp map <buffer> <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR>
-  " Finds global definition of text under cursor.
-  au FileType cpp map <buffer> <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
-augroup END
-
-au BufNewFile,BufRead *.py
-    \ set tabstop=4 |
-    \ set softtabstop=4 |
-    \ set shiftwidth=4 |
-    \ set textwidth=79 |
-    \ set expandtab |
-    \ set autoindent |
-    \ set fileformat=unix |
-
-augroup python
-  au FileType python map <buffer> <Leader>fs :cs find s <C-R>=expand("<cword>")<CR><CR>
-  " Finds all calls to text under cursor.
-  au FileType python map <buffer> <Leader>fc :cs find c <C-R>=expand("<cword>")<CR><CR>
-  " Finds global definition of text under cursor.
-  au FileType python map <buffer> <Leader>fg :cs find g <C-R>=expand("<cword>")<CR><CR>
-  au FileType python call matchadd('ColorColumn', '\%80v', 80)
-augroup END
-
-augroup vimrc_autocmds
-  autocmd BufEnter * highlight OverLength ctermbg=red guibg=#111111
-  autocmd BufEnter * match OverLength /\%80v.*/
-augroup END
-
-augroup xml
-  au FileType xml set ts=4
-  au FileType xml set sw=4
-augroup END
-
-augroup txt
-  au FileType text set syntax=conf
-augroup END
-
-augroup go
-  au BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2
-  au FileType go map <buffer> ,gd :GoDef <C-R>=expand("<cword>")<CR><CR>
-  au FileType go map <buffer> ,ga :GoAlternate<CR>
-  au FileType go set ts=2
-augroup END
+" Configures Lsp.
+au User lsp_setup call lsp#register_server({
+      \ 'name': 'Kythe Language Server',
+      \ 'cmd': {server_info->['/google/bin/releases/grok/tools/kythe_languageserver', '--google3']},
+      \ 'whitelist': ['python', 'go', 'cpp', 'proto'],
+      \})
+nnoremap gd :<C-u>LspDefinition<CR>
+nnoremap gr :<C-u>LspReferences<CR>
+""""""""" END OF PLUGIN SETTINGS """"""""""""""""""""""""""""
