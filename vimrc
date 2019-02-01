@@ -1,6 +1,9 @@
-set nocompatible              " be iMproved, required
-filetype off                  " required
 let mapleader="\<space>"
+set nocompatible   " Enable modern Vim features not compatible with Vi spec
+
+if filereadable(expand('~/.vim/google-config.vim'))
+  source ~/.vim/google-config.vim
+endif
 
 """""" START OF PLUG CONFIGURATION """"""""""""""""""""""""
 " Loads vim-plug.
@@ -10,27 +13,29 @@ endif
 
 " :PlugInstall, :PlugClean
 call plug#begin()
+Plug 'airblade/vim-gitgutter'          " Retained for git hunks
 Plug 'christoomey/vim-tmux-navigator'  " <ctrl-hjkl> for splits and panes
 Plug 'ctrlpvim/ctrlp.vim'              " Current fork of ctrlp
 Plug 'derekwyatt/vim-scala'            " Scala syntax
 Plug 'dyng/ctrlsf.vim'                 " Wrapper around Ack
 Plug 'elubow/cql-vim'                  " CQL syntax.
-Plug 'epeli/slimux'                    " Sends lines to tmux panes.
-Plug 'farmergreg/vim-lastplace'        " Restores last cursor position.
-Plug 'fatih/vim-go'                    " Golang.
-Plug 'flazz/vim-colorschemes'          " Additional colorschemes.
+Plug 'epeli/slimux'                    " Sends lines to tmux panes
+Plug 'farmergreg/vim-lastplace'        " Restores last cursor position
+Plug 'fatih/vim-go'                    " Golang
+Plug 'flazz/vim-colorschemes'          " Additional colorschemes
 Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
+Plug 'lervag/vimtex'                   " Latex, <leader>l mappings
 Plug 'mileszs/ack.vim'                 " Light wrapper around Ack
-Plug 'mhinz/vim-signify'               " Diff hunk changes.
-Plug 'NLKNguyen/papercolor-theme'      " PaperColor colorscheme.
-Plug 'nvie/vim-flake8'                 " Static checker for python.
-Plug 'prabirshrestha/async.vim'        " Normalize async jobs.
-Plug 'prabirshrestha/vim-lsp'          " Language server protocl.
+Plug 'mhinz/vim-signify'               " Git signs
+Plug 'NLKNguyen/papercolor-theme'      " PaperColor colorscheme
+Plug 'nvie/vim-flake8'                 " Static checker for python
+Plug 'prabirshrestha/async.vim'        " Normalize async jobs
+Plug 'prabirshrestha/vim-lsp'          " Language server protocl
 Plug 'tpope/vim-fugitive'              " Github
 Plug 'vim-airline/vim-airline'         " Status line
-Plug 'vim-airline/vim-airline-themes'  " Status line theme.
-Plug 'vim-scripts/indentpython.vim'    " Auto-indent for python.
-Plug 'vim-scripts/LargeFile'           " Disables features for large files.
+Plug 'vim-airline/vim-airline-themes'  " Status line theme
+Plug 'vim-scripts/indentpython.vim'    " Auto-indent for python
+Plug 'vim-scripts/LargeFile'           " Disables features for large files
 call plug#end()
 """""" END OF PLUG CONFIGURATION """""""""""""""
 
@@ -138,35 +143,19 @@ vmap <leader>p "+p
 vmap <leader>P "+P
 
 " Adds new file in the same directory as current file.
-map <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 
 " Window diff
-map <leader>d :windo diffthis<CR>
-map <leader>dw :set diffopt+=iwhite<CR>
-map <leader>du :diffupdate<CR>
+nnoremap <leader>d :windo diffthis<CR>
+nnoremap <leader>dw :set diffopt+=iwhite<CR>
+nnoremap <leader>du :diffupdate<CR>
 
 " Allows code navigation when { appears at the end of a line.
-map ]] :call search("^\\(\\w.*\\)\\?{")<CR>
-map [[ :call search("^\\(\\w.*\\)\\?{", "b")<CR>
-map ][ :call search("^}")<CR>
-map [] :call search("^}", "b")<CR>
+nnoremap ]] :call search("^\\(\\w.*\\)\\?{")<CR>
+nnoremap [[ :call search("^\\(\\w.*\\)\\?{", "b")<CR>
+nnoremap ][ :call search("^}")<CR>
+nnoremap [] :call search("^}", "b")<CR>
 """""""" END OF CUSTOM SHORTCUTS """"""""""""""""""""""
-
-"""""""" START OF LANGUAGE-SPECIFIC SHORTCUTS """""""""""""""
-" LaTeX macros for compiling and viewing.
-augroup latex_macros
-  au!
-  au FileType tex :nnoremap <leader>l :w<CR>:!rubber --pdf --warn all %<CR>
-  au FileType tex :nnoremap <leader>v :!mupdf %:r.pdf &<CR><CR>
-augroup END
-
-augroup scala
-  au FileType scala map <buffer> <Leader>fd :ScalaSearch<CR>
-  au FileType scala map <buffer> <Leader>fi :ScalaImport<CR>
-  au FileType scala map <buffer> <Leader>fv :Validate<CR>
-augroup END
-"""""""" END OF LANGUAGE-SPECIFIC SHORTCUTS """"""""""""""""""
-
 
 """""""" START OF FUNCTIONS  """""""""""""""""""""""""
 " Sets up diff with a wider screen.
@@ -223,10 +212,19 @@ let g:flake8_show_quickfix=1  " don't show
 " YCM setting.
 let g:ycm_autoclose_preview_window_after_completion=1
 
+" Uses Silver Searcher if available.
+if executable('ag')
+  " Use ag over grep
+  set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files, which respects .gitignore.
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+endif
+
 " CtrlP setting.
-nnoremap f :CtrlPMixed <CR>
-nnoremap fb :CtrlPBuffer <CR>
-nnoremap fu :CtrlPMRU <CR>
+nnoremap <leader>f :CtrlPMixed <CR>
+nnoremap <leader>fb :CtrlPBuffer <CR>
+nnoremap <leader>fu :CtrlPMRU <CR>
 let g:ctrlp_buffer = '<leader>b'
 let g:ctrlp_use_caching=0
 let g:ctrlp_working_path_mode = 'ra'
@@ -242,8 +240,8 @@ nmap <leader>sw <Plug>CtrlSFCwordPath<CR>
 nnoremap <leader>ss :CtrlSFToggle<CR>
 
 " Slimux shortcuts.
-map <leader>t :SlimuxREPLSendLine<CR>
-vmap <leader>t :SlimuxREPLSendSelection<CR>
+nnoremap <leader>t :SlimuxREPLSendLine<CR>
+vnoremap <leader>t :SlimuxREPLSendSelection<CR>
 
 " Enables airline all the time.
 set laststatus=2
@@ -258,6 +256,10 @@ let g:EclimFileTypeValidate = 0
 let g:EclimCompletionMethod = 'omnifunc'
 let g:EclimMavenPomClasspathUpdate = 0
 
+au FileType scala nnoremap <buffer> <Leader>fd :ScalaSearch<CR>
+au FileType scala nnoremap <buffer> <Leader>fi :ScalaImport<CR>
+au FileType scala nnoremap <buffer> <Leader>fv :Validate<CR>
+
 " vim-go
 let g:go_list_autoclose = 0
 let g:go_fmt_command = "goimports"
@@ -269,6 +271,7 @@ au User lsp_setup call lsp#register_server({
       \ 'cmd': {server_info->['/google/bin/releases/grok/tools/kythe_languageserver', '--google3']},
       \ 'whitelist': ['python', 'go', 'cpp', 'proto'],
       \})
-nnoremap gd :<C-u>LspDefinition<CR>
-nnoremap gr :<C-u>LspReferences<CR>
+
+au FileType cpp,go,proto nnoremap <buffer> gd :<C-u>LspDefinition<CR>
+au FileType cpp,go,proto nnoremap <buffer> gr :<C-u>LspReferences<CR>
 """"""""" END OF PLUGIN SETTINGS """"""""""""""""""""""""""""
