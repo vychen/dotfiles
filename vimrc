@@ -18,15 +18,18 @@ Plug 'christoomey/vim-tmux-navigator'  " <ctrl-hjkl> for splits and panes
 Plug 'ctrlpvim/ctrlp.vim'              " Current fork of ctrlp
 Plug 'derekwyatt/vim-scala'            " Scala syntax
 Plug 'dyng/ctrlsf.vim'                 " Wrapper around Ack
-Plug 'elubow/cql-vim'                  " CQL syntax.
+Plug 'elubow/cql-vim'                  " CQL syntax
+Plug 'elzr/vim-json'                   " JSON synax
 Plug 'epeli/slimux'                    " Sends lines to tmux panes
 Plug 'farmergreg/vim-lastplace'        " Restores last cursor position
 Plug 'fatih/vim-go'                    " Golang
 Plug 'flazz/vim-colorschemes'          " Additional colorschemes
 Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
 Plug 'lervag/vimtex'                   " Latex, <leader>l mappings
+Plug 'majutsushi/tagbar'               " Tags for code summary
 Plug 'mileszs/ack.vim'                 " Light wrapper around Ack
 Plug 'mhinz/vim-signify'               " Git signs
+Plug 'motus/pig.vim'                   " Pig syntax
 Plug 'NLKNguyen/papercolor-theme'      " PaperColor colorscheme
 Plug 'nvie/vim-flake8'                 " Static checker for python
 Plug 'prabirshrestha/async.vim'        " Normalize async jobs
@@ -36,6 +39,7 @@ Plug 'vim-airline/vim-airline'         " Status line
 Plug 'vim-airline/vim-airline-themes'  " Status line theme
 Plug 'vim-scripts/indentpython.vim'    " Auto-indent for python
 Plug 'vim-scripts/LargeFile'           " Disables features for large files
+Plug 'vim-scripts/vim-gradle'          " Gradle syntax
 call plug#end()
 """""" END OF PLUG CONFIGURATION """""""""""""""
 
@@ -63,14 +67,6 @@ augroup style
   au FileType go setlocal noexpandtab ts=2 sw=2
   au FileType py setlocal sts=2 ff=unix
   au FileType text setlocal syntax=conf
-augroup END
-
-" Syntax highlighting.
-augroup filetypedetect
-  au BufNewFile,BufRead *.json set ft=javascript
-  au BufNewFile,BufRead *.gradle set ft=groovy
-  " Requires file ~/.vim/syntax/pig.vim
-  au BufNewFile,BufRead *.pig set ft=pig syntax=pig
 augroup END
 
 " Highlight long lines.
@@ -206,9 +202,6 @@ command! TrimWhitespace call TrimWhitespace()
 :noremap <Leader>ws :call TrimWhitespace()<CR>
 
 """""""" START OF PLUGIN SETTINGS """""""""""""""""
-" Flake8 settings.
-let g:flake8_show_quickfix=1  " don't show
-
 " YCM setting.
 let g:ycm_autoclose_preview_window_after_completion=1
 
@@ -235,9 +228,13 @@ let g:ctrlp_custom_ignore = {
   \ }
 
 " CtrlSFPrompt
-nmap <leader>s <Plug>CtrlSFPrompt -R -I 
+nmap <leader>s <Plug>CtrlSFPrompt -R 
 nmap <leader>sw <Plug>CtrlSFCwordPath<CR>
 nnoremap <leader>ss :CtrlSFToggle<CR>
+
+let g:ctrlsf_auto_focus = {
+  \ "at" : "none"
+  \ }
 
 " Slimux shortcuts.
 nnoremap <leader>t :SlimuxREPLSendLine<CR>
@@ -251,7 +248,7 @@ let g:airline_theme='papercolor'
 nnoremap <leader>ga :Git add %:p<CR><CR>
 nnoremap <leader>gs :Gstatus<CR>
 
-" Eclim
+" Eclim.
 let g:EclimFileTypeValidate = 0
 let g:EclimCompletionMethod = 'omnifunc'
 let g:EclimMavenPomClasspathUpdate = 0
@@ -260,10 +257,14 @@ au FileType scala nnoremap <buffer> <Leader>fd :ScalaSearch<CR>
 au FileType scala nnoremap <buffer> <Leader>fi :ScalaImport<CR>
 au FileType scala nnoremap <buffer> <Leader>fv :Validate<CR>
 
-" vim-go
+" vim-go.
 let g:go_list_autoclose = 0
 let g:go_fmt_command = "goimports"
 let g:go_auto_type_info = 1
+
+" Tagbar.
+nmap <F8> :TagbarToggle<CR>
+let g:tagbar_left=1
 
 " Configures Lsp.
 au User lsp_setup call lsp#register_server({
