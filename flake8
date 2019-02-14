@@ -1,0 +1,4 @@
+[flake8]
+# Save in ~/.config/flake8
+ignore = E111,E114
+max-line-length = 80
