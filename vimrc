@@ -28,7 +28,6 @@ Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
 Plug 'lervag/vimtex'                   " Latex, <leader>l mappings
 Plug 'majutsushi/tagbar'               " Tags for code summary
 Plug 'mileszs/ack.vim'                 " Light wrapper around Ack
-Plug 'mhinz/vim-signify'               " Git signs
 Plug 'motus/pig.vim'                   " Pig syntax
 Plug 'NLKNguyen/papercolor-theme'      " PaperColor colorscheme
 Plug 'nvie/vim-flake8'                 " Static checker for python
@@ -139,7 +138,7 @@ vmap <leader>p "+p
 vmap <leader>P "+P
 
 " Adds new file in the same directory as current file.
-nnoremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 
 " Window diff
 nnoremap <leader>d :windo diffthis<CR>
@@ -151,6 +150,13 @@ nnoremap ]] :call search("^\\(\\w.*\\)\\?{")<CR>
 nnoremap [[ :call search("^\\(\\w.*\\)\\?{", "b")<CR>
 nnoremap ][ :call search("^}")<CR>
 nnoremap [] :call search("^}", "b")<CR>
+
+" Cscope binding.
+au FileType cpp,h map <buffer> ,gs :cs find s <C-R>=expand("<cword>")<CR><CR>
+" Finds all calls to text under cursor.
+au FileType cpp,h map <buffer> ,gc :cs find c <C-R>=expand("<cword>")<CR><CR>
+" Finds global definition of text under cursor.
+au FileType cpp,h map <buffer> ,gg :cs find g <C-R>=expand("<cword>")<CR><CR>
 """""""" END OF CUSTOM SHORTCUTS """"""""""""""""""""""
 
 """""""" START OF FUNCTIONS  """""""""""""""""""""""""
@@ -218,10 +224,7 @@ endif
 nnoremap <leader>f :CtrlPMixed <CR>
 nnoremap <leader>fb :CtrlPBuffer <CR>
 nnoremap <leader>fu :CtrlPMRU <CR>
-let g:ctrlp_buffer = '<leader>b'
 let g:ctrlp_use_caching=0
-let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_regexp=1
 let g:ctrlp_custom_ignore = {
   \ 'dir':  '\v[\/](\.git|bin|docs|vendor)$',
   \ 'file': '\v\.(class|pyc|parquet)$',
