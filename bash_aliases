@@ -12,3 +12,4 @@ __git_complete gb _git_branch
 alias gd="git diff"
 alias gco="git checkout"
 __git_complete gco _git_checkout
+alias gst="git status"
