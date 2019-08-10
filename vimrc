@@ -13,7 +13,6 @@ endif
 
 " :PlugInstall, :PlugClean
 call plug#begin()
-Plug 'airblade/vim-gitgutter'          " Retained for git hunks
 Plug 'christoomey/vim-tmux-navigator'  " <ctrl-hjkl> for splits and panes
 Plug 'ctrlpvim/ctrlp.vim'              " Current fork of ctrlp
 Plug 'derekwyatt/vim-scala'            " Scala syntax
@@ -28,6 +27,7 @@ Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
 Plug 'lervag/vimtex'                   " Latex, <leader>l mappings
 Plug 'majutsushi/tagbar'               " Tags for code summary
 Plug 'mileszs/ack.vim'                 " Light wrapper around Ack
+Plug 'mhinz/vim-signify'               " Git signs
 Plug 'motus/pig.vim'                   " Pig syntax
 Plug 'NLKNguyen/papercolor-theme'      " PaperColor colorscheme
 Plug 'nvie/vim-flake8'                 " Static checker for python
