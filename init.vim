@@ -7,13 +7,12 @@ endif
 
 """""" START OF PLUG CONFIGURATION """"""""""""""""""""""""
 " Loads vim-plug.
-if empty(glob("~/.local/share/nvim/site/autoload/plug.vim"))
-  execute '!curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.github.com/junegunn/vim-plug/master/plug.vim'
+if empty(glob("~/.vim/autoload/plug.vim"))
+  execute '!curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 endif
 
 " :PlugInstall, :PlugClean
 call plug#begin()
-Plug 'airblade/vim-gitgutter'          " Retained for git hunks
 Plug 'christoomey/vim-tmux-navigator'  " <ctrl-hjkl> for splits and panes
 Plug 'ctrlpvim/ctrlp.vim'              " Current fork of ctrlp
 Plug 'derekwyatt/vim-scala'            " Scala syntax
@@ -27,13 +26,12 @@ Plug 'flazz/vim-colorschemes'          " Additional colorschemes
 Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
 Plug 'lervag/vimtex'                   " Latex, <leader>l mappings
 Plug 'majutsushi/tagbar'               " Tags for code summary
-Plug 'mileszs/ack.vim'                 " Light wrapper around Ack
+Plug 'mhinz/vim-signify'               " Diff signs.
 Plug 'motus/pig.vim'                   " Pig syntax
 Plug 'NLKNguyen/papercolor-theme'      " PaperColor colorscheme
 Plug 'nvie/vim-flake8'                 " Static checker for python
 Plug 'prabirshrestha/async.vim'        " Normalize async jobs
 Plug 'prabirshrestha/vim-lsp'          " Language server protocl
-Plug 'tpope/vim-fugitive'              " Github
 Plug 'vim-airline/vim-airline'         " Status line
 Plug 'vim-airline/vim-airline-themes'  " Status line theme
 Plug 'vim-scripts/indentpython.vim'    " Auto-indent for python
@@ -230,14 +228,12 @@ let g:ctrlp_custom_ignore = {
   \ 'file': '\v\.(class|pyc|parquet)$',
   \ }
 
-" CtrlSFPrompt
+" CtrlSF.
 nmap <leader>s <Plug>CtrlSFPrompt -R 
 nmap <leader>sw <Plug>CtrlSFCwordPath<CR>
 nnoremap <leader>ss :CtrlSFToggle<CR>
-
-let g:ctrlsf_auto_focus = {
-  \ "at" : "none"
-  \ }
+let g:ctrlsf_ignore_dir = ['blaze-bin', 'blaze-genfiles', 'blaze-google3',
+                           \'blaze-out', 'blaze-testlogs']
 
 " Slimux shortcuts.
 nnoremap <leader>t :SlimuxREPLSendLine<CR>
@@ -276,6 +272,6 @@ au User lsp_setup call lsp#register_server({
       \ 'whitelist': ['python', 'go', 'cpp', 'proto'],
       \})
 
-au FileType cpp,go,proto nnoremap <buffer> gd :<C-u>LspDefinition<CR>
-au FileType cpp,go,proto nnoremap <buffer> gr :<C-u>LspReferences<CR>
+au FileType cpp,go,proto,python nnoremap <buffer> gd :<C-u>LspDefinition<CR>
+au FileType cpp,go,proto,python nnoremap <buffer> gr :<C-u>LspReferences<CR>
 """"""""" END OF PLUGIN SETTINGS """"""""""""""""""""""""""""
