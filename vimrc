@@ -14,7 +14,6 @@ endif
 " :PlugInstall, :PlugClean
 call plug#begin()
 Plug 'christoomey/vim-tmux-navigator'  " <ctrl-hjkl> for splits and panes
-Plug 'ctrlpvim/ctrlp.vim'              " Current fork of ctrlp
 Plug 'derekwyatt/vim-scala'            " Scala syntax
 Plug 'dyng/ctrlsf.vim'                 " Wrapper around Ack
 Plug 'elubow/cql-vim'                  " CQL syntax
@@ -24,6 +23,7 @@ Plug 'farmergreg/vim-lastplace'        " Restores last cursor position
 Plug 'fatih/vim-go'                    " Golang
 Plug 'flazz/vim-colorschemes'          " Additional colorschemes
 Plug 'JCLiang/vim-cscope-utils'        " Reloads ctags/cscope using <leader>ca
+Plug 'junegunn/fzf.vim'                " Integration with fzf.
 Plug 'lervag/vimtex'                   " Latex, <leader>l mappings
 Plug 'majutsushi/tagbar'               " Tags for code summary
 Plug 'mhinz/vim-signify'               " Diff signs.
@@ -40,7 +40,6 @@ Plug 'vim-scripts/LargeFile'           " Disables features for large files
 Plug 'vim-scripts/vim-gradle'          " Gradle syntax
 call plug#end()
 """""" END OF PLUG CONFIGURATION """""""""""""""
-
 filetype plugin indent on
 syntax on
 
@@ -210,29 +209,30 @@ command! TrimWhitespace call TrimWhitespace()
 " YCM setting.
 let g:ycm_autoclose_preview_window_after_completion=1
 
-" Uses Silver Searcher if available.
-if executable('ag')
-  " Use ag over grep
-  set grepprg=ag\ --nogroup\ --nocolor
-
-  " Use ag in CtrlP for listing files, which respects .gitignore.
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+" Uses ripgrep if available.
+if executable('rg')
+  " Use rg over grep.
+  set grepprg=rg\ --vimgrep\ --no-heading\ smart-case
 endif
 
-" CtrlP setting.
-nnoremap <leader>f :CtrlPMixed <CR>
-nnoremap <leader>fb :CtrlPBuffer <CR>
-nnoremap <leader>fu :CtrlPMRU <CR>
-let g:ctrlp_use_caching=0
-let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/](\.git|bin|docs|vendor)$',
-  \ 'file': '\v\.(class|pyc|parquet)$',
-  \ }
+" FZF.
+set rtp+=~/.fzf
+if !empty(glob("WORKSPACE"))
+  let $FZF_DEFAULT_COMMAND = join(map(copy(g:g3_directories),
+        \ '''rg '' . v:val . '' --files'''), ' ; ')
+else
+  let $FZF_DEFAULT_COMMAND='rg --files'
+endif
+let $FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+nnoremap <leader>f :Files <CR>
+nnoremap <leader>fb :Buffers <CR>
+nnoremap <leader>b :Buffers <CR>
 
 " CtrlSF.
 nmap <leader>s <Plug>CtrlSFPrompt -R 
 nmap <leader>sw <Plug>CtrlSFCwordPath<CR>
 nnoremap <leader>ss :CtrlSFToggle<CR>
+let g:ctrlsf_indent=2
 let g:ctrlsf_ignore_dir = ['blaze-bin', 'blaze-genfiles', 'blaze-google3',
                            \'blaze-out', 'blaze-testlogs']
 
