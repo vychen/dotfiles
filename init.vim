@@ -1,7 +1,9 @@
 let mapleader="\<space>"
 
+set nocompatible
 
-if filereadable(expand('~/.vim/google-config.vim'))
+if stridx(getcwd(), "google3") > 0 &&
+      \ filereadable(expand('~/.vim/google-config.vim'))
   source ~/.vim/google-config.vim
 endif
 
@@ -142,6 +144,9 @@ nnoremap <leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <leader>d :windo diffthis<CR>
 nnoremap <leader>dw :set diffopt+=iwhite<CR>
 nnoremap <leader>du :diffupdate<CR>
+" If doing a diff. Upon writing changes to file, automatically update the
+" differences.
+autocmd BufWritePost * if &diff == 1 | diffupdate | endif
 
 " Allows code navigation when { appears at the end of a line.
 nnoremap ]] :call search("^\\(\\w.*\\)\\?{")<CR>
@@ -235,6 +240,9 @@ nnoremap <leader>ss :CtrlSFToggle<CR>
 let g:ctrlsf_indent=2
 let g:ctrlsf_ignore_dir = ['blaze-bin', 'blaze-genfiles', 'blaze-google3',
                            \'blaze-out', 'blaze-testlogs']
+let g:ctrlsf_search_mode = 'async'
+let g:ctrlsf_default_root = 'cwd'
+let g:ctrlsf_position = 'bottom'
 
 " Slimux shortcuts.
 nnoremap <leader>t :SlimuxREPLSendLine<CR>
@@ -247,6 +255,18 @@ let g:airline_theme='papercolor'
 " Git gutter shortcuts.
 nnoremap <leader>ga :Git add %:p<CR><CR>
 nnoremap <leader>gs :Gstatus<CR>
+
+let g:signify_against_master = 0
+function SignifyMaster()
+  if g:signify_against_master
+      let g:signify_vcs_cmds.hg = "hg diff --color=never --config aliases.diff= --nodates -U0 -- %f"
+      let g:signify_against_master = 0
+  else
+      let g:signify_vcs_cmds.hg = "hg pdiff --color=never --config aliases.diff= --nodates -U0 -- %f"
+      let g:signify_against_master = 1
+  endif
+endfunction
+nmap <leader>hd :call SignifyMaster()<CR>
 
 " Eclim.
 let g:EclimFileTypeValidate = 0
@@ -264,6 +284,7 @@ let g:go_auto_type_info = 1
 
 " Tagbar.
 nmap <F8> :TagbarToggle<CR>
+nnoremap <leader>tb :TagbarToggle<CR>
 let g:tagbar_left=1
 
 " Configures Lsp.

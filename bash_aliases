@@ -1,9 +1,9 @@
-alias vi='vim'
 alias untar='tar -zxvf'
 alias rm="rm -i"
 alias c="clear"
 alias h="history"
 alias lsdir="ls -d */"
+alias nvi="nvim"
 alias o="gnome-open"
 
 # git.
