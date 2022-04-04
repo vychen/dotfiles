@@ -131,3 +131,12 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+if type rg &> /dev/null; then
+  if [ -f WORKSPACE ]; then # Indicates the top of a G3 directory.
+    export FZF_DEFAULT_COMMAND='rg --files $GOOGLE3DIR'
+  else
+    export FZF_DEFAULT_COMMAND='rg --files'
+  fi
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
