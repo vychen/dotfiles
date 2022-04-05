@@ -11,10 +11,16 @@ esac
 # vi command line mode.
 set -o vi
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-export HISTCONTROL=ignoredups:erasedups
+export PATH=$PATH:$HOME/.local/bin  # Bin location for powerline
+# Prereq: Install powerline
+# pip install powerline-status
+powerline-daemon -q
+POWERLINE_BASH_CONTINUATION=1
+POWERLINE_BASH_SELECT=1
+powerline_repo_root=$HOME/.local/lib/python3.9/site-packages
+. $powerline_repo_root/powerline/bindings/bash/powerline.sh
 
+export HISTCONTROL=ignoredups:erasedups
 # Append to the history file, don't overwrite it.
 shopt -s histappend
 # After each command, save and reload history
@@ -59,14 +65,14 @@ fi
 #force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
-  if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-    # We have color support; assume it's compliant with Ecma-48
-    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-    # a case would tend to support setf rather than setaf.)
-    color_prompt=yes
-  else
-    color_prompt=
-  fi
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+        # We have color support; assume it's compliant with Ecma-48
+        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+        # a case would tend to support setf rather than setaf.)
+        color_prompt=yes
+    else
+        color_prompt=
+    fi
 fi
 
 if [ "$color_prompt" = yes ]; then
@@ -115,12 +121,6 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# Searches for a file (possibly a regular expression), then changes into its
-# directory.
-cdf() {
-  cd "$(dirname "$(find . -name $1  -type f | head -1)")"
-}
-
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
@@ -132,15 +132,20 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# Searches for a file (possibly a regular expression), then changes into its
+# directory.
+cdf() {
+  cd "$(dirname "$(find . -name $1  -type f | head -1)")"
+}
+
 # Prereq: Install fzf.
 # git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 # ~/.fzf/install
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# Prereq: Install riggrep
 if type rg &> /dev/null; then
-  if [ -f WORKSPACE ]; then # Indicates the top of a G3 directory.
-    export FZF_DEFAULT_COMMAND='rg --files $GOOGLE3DIR'
-  else
-    export FZF_DEFAULT_COMMAND='rg --files'
-  fi
+  export FZF_DEFAULT_COMMAND='rg --files'
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
