@@ -131,6 +131,10 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+# Prereq: Install fzf.
+# git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+# ~/.fzf/install
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 if type rg &> /dev/null; then
   if [ -f WORKSPACE ]; then # Indicates the top of a G3 directory.
