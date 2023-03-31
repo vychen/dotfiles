@@ -17,7 +17,7 @@ export PATH=$PATH:$HOME/.local/bin  # Bin location for powerline
 powerline-daemon -q
 POWERLINE_BASH_CONTINUATION=1
 POWERLINE_BASH_SELECT=1
-powerline_repo_root=$HOME/.local/lib/python3.9/site-packages
+powerline_repo_root=$HOME/.local/lib/python3.10/site-packages
 . $powerline_repo_root/powerline/bindings/bash/powerline.sh
 
 export HISTCONTROL=ignoredups:erasedups
@@ -56,7 +56,7 @@ fi
 
 if [ "$TERM" == "xterm" ]; then
     # No it isn't, it's gnome-terminal
-    export TERM=xterm-256color
+    export TERM=xterm
 fi
 
 # uncomment for a colored prompt, if the terminal has the capability; turned

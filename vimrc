@@ -1,10 +1,6 @@
 let mapleader="\<space>"
 set nocompatible   " Enable modern Vim features not compatible with Vi spec
 
-if filereadable(expand('~/.vim/google-config.vim'))
-  source ~/.vim/google-config.vim
-endif
-
 """""" START OF PLUG CONFIGURATION """"""""""""""""""""""""
 " Loads vim-plug.
 if empty(glob("~/.vim/autoload/plug.vim"))

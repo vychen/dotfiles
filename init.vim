@@ -2,15 +2,11 @@ let mapleader="\<space>"
 
 set nocompatible
 
-if stridx(getcwd(), "google3") > 0 &&
-      \ filereadable(expand('~/.vim/google-config.vim'))
-  source ~/.vim/google-config.vim
-endif
-
 """""" START OF PLUG CONFIGURATION """"""""""""""""""""""""
 " Loads vim-plug.
-if empty(glob("~/.vim/autoload/plug.vim"))
-  execute '!curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+if empty(glob("~/.local/share/nvim/site/autoload/plug.vim"))
+  execute '!curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 endif
 
 " :PlugInstall, :PlugClean
@@ -287,12 +283,14 @@ nmap <F8> :TagbarToggle<CR>
 nnoremap <leader>tb :TagbarToggle<CR>
 let g:tagbar_left=1
 
-" Configures Lsp.
-au User lsp_setup call lsp#register_server({
-      \ 'name': 'Kythe Language Server',
-      \ 'cmd': {server_info->['/google/bin/releases/grok/tools/kythe_languageserver', '--google3']},
-      \ 'whitelist': ['python', 'go', 'cpp', 'proto'],
-      \})
+if executable('pylsp')
+  " pip install python-lsp-server
+  au User lsp_setup call lsp#register_server({
+        \ 'name': 'pylsp',
+        \ 'cmd': {server_info->['pylsp']},
+        \ 'allowlist': ['python'],
+        \ })
+endif
 
 au FileType cpp,go,proto,python nnoremap <buffer> gd :<C-u>LspDefinition<CR>
 au FileType cpp,go,proto,python nnoremap <buffer> gr :<C-u>LspReferences<CR>
